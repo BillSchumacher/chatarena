@@ -57,10 +57,24 @@ def get_moderator_components(visible=True):
             backend_type = gr.Dropdown(show_label=False, visible=visible, interactive=True,
                                        choices=list(BACKEND_REGISTRY.keys()), value=DEFAULT_BACKEND)
             with gr.Accordion(f"{name} Parameters", open=False, visible=visible) as accordion:
-                temperature = gr.Slider(minimum=0, maximum=2.0, step=0.1, interactive=True, visible=visible,
-                                        label=f"temperature", value=0.7)
-                max_tokens = gr.Slider(minimum=10, maximum=500, step=10, interactive=True, visible=visible,
-                                       label=f"max tokens", value=200)
+                temperature = gr.Slider(
+                    minimum=0,
+                    maximum=2.0,
+                    step=0.1,
+                    interactive=True,
+                    visible=visible,
+                    label="temperature",
+                    value=0.7,
+                )
+                max_tokens = gr.Slider(
+                    minimum=10,
+                    maximum=500,
+                    step=10,
+                    interactive=True,
+                    visible=visible,
+                    label="max tokens",
+                    value=200,
+                )
 
     return [role_desc, terminal_condition, backend_type, accordion, temperature, max_tokens]
 
@@ -74,10 +88,24 @@ def get_player_components(name, visible):
             backend_type = gr.Dropdown(show_label=False, choices=list(BACKEND_REGISTRY.keys()),
                                        interactive=True, visible=visible, value=DEFAULT_BACKEND)
             with gr.Accordion(f"{name} Parameters", open=False, visible=visible) as accordion:
-                temperature = gr.Slider(minimum=0, maximum=2.0, step=0.1, interactive=True, visible=visible,
-                                        label=f"temperature", value=0.7)
-                max_tokens = gr.Slider(minimum=10, maximum=500, step=10, interactive=True, visible=visible,
-                                       label=f"max tokens", value=200)
+                temperature = gr.Slider(
+                    minimum=0,
+                    maximum=2.0,
+                    step=0.1,
+                    interactive=True,
+                    visible=visible,
+                    label="temperature",
+                    value=0.7,
+                )
+                max_tokens = gr.Slider(
+                    minimum=10,
+                    maximum=500,
+                    step=10,
+                    interactive=True,
+                    visible=visible,
+                    label="max tokens",
+                    value=200,
+                )
 
     return [role_desc, backend_type, accordion, temperature, max_tokens]
 
@@ -172,14 +200,14 @@ Prompting multiple AI agents to play games in a language-driven environment.
 
     def _convert_to_chatbot_output(all_messages, display_recv=False):
         chatbot_output = []
-        for i, message in enumerate(all_messages):
+        for message in all_messages:
             agent_name, msg, recv = message.agent_name, message.content, str(message.visible_to)
             new_msg = re.sub(r'\n+', '<br>', msg.strip())  # Preprocess message for chatbot output
-            if display_recv:
-                new_msg = f"**{agent_name} (-> {recv})**: {new_msg}"  # Add role to the message
-            else:
-                new_msg = f"**{agent_name}**: {new_msg}"
-
+            new_msg = (
+                f"**{agent_name} (-> {recv})**: {new_msg}"
+                if display_recv
+                else f"**{agent_name}**: {new_msg}"
+            )
             if agent_name == "Moderator":
                 chatbot_output.append((new_msg, None))
             else:
@@ -232,9 +260,7 @@ Prompting multiple AI agents to play games in a language-driven environment.
             "moderator_period": "turn"
         }
 
-        # arena_config = {"players": player_configs, "environment": env_config}
-        arena_config = ArenaConfig(players=player_configs, environment=env_config)
-        return arena_config
+        return ArenaConfig(players=player_configs, environment=env_config)
 
 
     def step_game(all_comps: dict):
@@ -315,10 +341,7 @@ Prompting multiple AI agents to play games in a language-driven environment.
     # If any of the Textbox, Slider, Checkbox, Dropdown, RadioButtons is changed, the Step button is disabled
     for comp in all_components:
         def _disable_step_button(state):
-            if state["arena"] is not None:
-                return gr.update(interactive=False)
-            else:
-                return gr.update()
+            return gr.update() if state["arena"] is None else gr.update(interactive=False)
 
 
         if isinstance(comp,
@@ -335,11 +358,11 @@ Prompting multiple AI agents to play games in a language-driven environment.
     def update_components_from_example(all_comps: dict):
         example_name = all_comps[example_selector]
         example_config = EXAMPLE_REGISTRY[example_name]
-        update_dict = {}
-
         # Update the environment components
         env_config = example_config['environment']
-        update_dict[env_desc_textbox] = gr.update(value=example_config['global_prompt'])
+        update_dict = {
+            env_desc_textbox: gr.update(value=example_config['global_prompt'])
+        }
         update_dict[env_selector] = gr.update(value=env_config['env_type'])
         update_dict[parallel_checkbox] = gr.update(value=env_config['parallel'])
 

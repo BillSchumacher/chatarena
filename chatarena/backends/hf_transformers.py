@@ -34,8 +34,7 @@ class TransformersConversational(IntelligenceBackend):
     @retry(stop=stop_after_attempt(6), wait=wait_random_exponential(min=1, max=60))
     def _get_response(self, conversation: Conversation):
         conversation = self.chatbot(conversation)
-        response = conversation.generated_responses[-1]
-        return response
+        return conversation.generated_responses[-1]
 
     @staticmethod
     def _msg_template(agent_name, content):
@@ -46,8 +45,7 @@ class TransformersConversational(IntelligenceBackend):
         user_inputs, generated_responses = [], []
 
         all_messages = [("System", global_prompt), ("System", prompt)]
-        for msg in history_messages:
-            all_messages.append((msg.agent_name, msg.content))
+        all_messages.extend((msg.agent_name, msg.content) for msg in history_messages)
         if request_msg:
             all_messages.append(("System", request_msg.content))
 
@@ -77,9 +75,7 @@ class TransformersConversational(IntelligenceBackend):
         conversation = Conversation(text=new_user_input, past_user_inputs=past_user_inputs,
                                     generated_responses=generated_responses)
 
-        # Get the response
-        response = self._get_response(conversation)
-        return response
+        return self._get_response(conversation)
 
 # conversation = Conversation("Going to the movies tonight - any suggestions?")
 #

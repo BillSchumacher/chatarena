@@ -34,5 +34,3 @@ class IntelligenceBackend(Configurable):
     def reset(self):
         if self.stateful:
             raise NotImplementedError
-        else:
-            pass

@@ -112,8 +112,10 @@ class Moderator(Player):
                             f"Error: {e.last_attempt.exception()}.")
             return True
 
-        if re.match(r"yes|y|yea|yeah|yep|yup|sure|ok|okay|alright", response, re.IGNORECASE):
-            # print(f"Decision: {response}. Conversation is ended by moderator.")
-            return True
-        else:
-            return False
+        return bool(
+            re.match(
+                r"yes|y|yea|yeah|yep|yup|sure|ok|okay|alright",
+                response,
+                re.IGNORECASE,
+            )
+        )

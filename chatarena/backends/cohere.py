@@ -12,11 +12,7 @@ try:
 except ImportError:
     is_cohere_available = False
 else:
-    if os.environ.get('COHEREAI_API_KEY') is None:
-        is_cohere_available = False
-    else:
-        is_cohere_available = True
-
+    is_cohere_available = os.environ.get('COHEREAI_API_KEY') is not None
 # Default config follows the [Cohere documentation](https://cohere-sdk.readthedocs.io/en/latest/cohere.html#cohere.client.Client.chat)
 DEFAULT_TEMPERATURE = 0.8
 DEFAULT_MAX_TOKENS = 200
@@ -84,12 +80,11 @@ class CohereAIChat(IntelligenceBackend):
         new_messages = history_messages[new_message_start_idx:]
         assert len(new_messages) > 0, "No new messages found (this should not happen)"
 
-        new_conversations = []
-        for message in new_messages:
-            if message.agent_name != agent_name:
-                # Since there are more than one player, we need to distinguish between the players
-                new_conversations.append(f"[{message.agent_name}]: {message.content}")
-
+        new_conversations = [
+            f"[{message.agent_name}]: {message.content}"
+            for message in new_messages
+            if message.agent_name != agent_name
+        ]
         if request_msg:
             new_conversations.append(f"[{request_msg.agent_name}]: {request_msg.content}")
 

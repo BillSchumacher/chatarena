@@ -55,8 +55,7 @@ class OpenAIChat(IntelligenceBackend):
         )
 
         response = completion.choices[0]['message']['content']
-        response = response.strip()
-        return response
+        return response.strip()
 
     def _hidden_prompt(self, agent_name: str):
         """
@@ -83,7 +82,7 @@ class OpenAIChat(IntelligenceBackend):
             request_msg: the request for the chatGPT
         """
         conversations = []
-        for i, message in enumerate(history_messages):
+        for message in history_messages:
             if message.agent_name == agent_name:
                 conversations.append({"role": "assistant", "content": message.content})
             else:
@@ -91,7 +90,7 @@ class OpenAIChat(IntelligenceBackend):
                 conversations.append({"role": "user", "content": f"[{message.agent_name}]: {message.content}"})
 
         system_prompt_str = f"Your name is {agent_name}.\n{prompt}\n" \
-                            f"Other instructions:\n{self._hidden_prompt(agent_name)}"
+                                f"Other instructions:\n{self._hidden_prompt(agent_name)}"
         if global_prompt:  # Prepend the global prompt if it exists
             system_prompt_str = f"{global_prompt.strip()}\n{system_prompt_str}"
         system_prompt = {"role": "system", "content": system_prompt_str}

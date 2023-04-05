@@ -6,8 +6,7 @@ import hashlib
 
 
 def _hash(input: str):
-    hex_dig = hashlib.sha256(input.encode()).hexdigest()
-    return hex_dig
+    return hashlib.sha256(input.encode()).hexdigest()
 
 
 @dataclass
@@ -56,17 +55,11 @@ class MessagePool():
 
     @property
     def last_turn(self):
-        if len(self._messages) == 0:
-            return 0
-        else:
-            return self._messages[-1].turn
+        return 0 if len(self._messages) == 0 else self._messages[-1].turn
 
     @property
     def last_message(self):
-        if len(self._messages) == 0:
-            return None
-        else:
-            return self._messages[-1]
+        return None if len(self._messages) == 0 else self._messages[-1]
 
     def get_all_messages(self) -> List[Message]:
         return self._messages
@@ -79,8 +72,10 @@ class MessagePool():
         # Get the messages before the current turn
         prev_messages = [message for message in self._messages if message.turn < turn]
 
-        visible_messages = []
-        for message in prev_messages:
-            if message.visible_to == "all" or agent_name in message.visible_to or agent_name == "Moderator":
-                visible_messages.append(message)
-        return visible_messages
+        return [
+            message
+            for message in prev_messages
+            if message.visible_to == "all"
+            or agent_name in message.visible_to
+            or agent_name == "Moderator"
+        ]

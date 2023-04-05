@@ -29,10 +29,9 @@ class Conversation(Environment):
         self._next_player_idx = 0
         self.message_pool.reset()
 
-        init_timestep = TimeStep(observation=[],
-                                 reward=self.get_zero_rewards(),
-                                 terminal=False)
-        return init_timestep
+        return TimeStep(
+            observation=[], reward=self.get_zero_rewards(), terminal=False
+        )
 
     def to_config(self) -> EnvironmentConfig:
         return EnvironmentConfig(env_type=self.type_name, player_names=self.player_names, parallel=self.parallel)
@@ -78,10 +77,11 @@ class Conversation(Environment):
             self._current_turn += 1
         self._next_player_idx = (self._next_player_idx + 1) % self.num_players
 
-        timestep = TimeStep(observation=self.get_observation(),
-                            reward=self.get_zero_rewards(),
-                            terminal=self.is_terminal())  # Return all the messages
-        return timestep
+        return TimeStep(
+            observation=self.get_observation(),
+            reward=self.get_zero_rewards(),
+            terminal=self.is_terminal(),
+        )
 
 
 class ModeratedConversation(Conversation):
@@ -128,7 +128,7 @@ class ModeratedConversation(Conversation):
         self._next_player_idx = (self._next_player_idx + 1) % self.num_players
 
         if self.moderator_period == "turn" or \
-                (self.moderator_period == "round" and self._next_player_idx == 0):
+                    (self.moderator_period == "round" and self._next_player_idx == 0):
             # Moderator's turn
             moderator_history = self.message_pool.get_all_messages()
             moderator_response = self.moderator(moderator_history)
@@ -145,7 +145,8 @@ class ModeratedConversation(Conversation):
         if not self.parallel or self._next_player_idx == 0:
             self._current_turn += 1
 
-        timestep = TimeStep(observation=self.get_observation(),
-                            reward=self.get_zero_rewards(),
-                            terminal=terminal)  # Return all the messages
-        return timestep
+        return TimeStep(
+            observation=self.get_observation(),
+            reward=self.get_zero_rewards(),
+            terminal=terminal,
+        )

@@ -56,15 +56,13 @@ class Arena:
         observation = self.environment.get_observation(player_name)  # get the observation for the player
 
         timestep = None
-        for i in range(self.invalid_actions_retry):  # try to take an action for a few times
+        for _ in range(self.invalid_actions_retry):
             action = player(observation)  # take an action
             if self.environment.check_action(action, player_name):
                 timestep = self.environment.step(player_name, action)  # update the environment
                 break
             else:
                 logging.warning(f"{player_name} made an invalid action {action}")
-                continue
-
         if timestep is None:  # if the player made invalid actions for too many times, terminate the game
             warning_msg = f"{player_name} has made invalid actions for {self.invalid_actions_retry} times. Terminating the game."
             logging.warning(warning_msg)
@@ -84,7 +82,7 @@ class Arena:
         """
         run the game for num_turns
         """
-        for i in range(num_steps):
+        for _ in range(num_steps):
             timestep = self.step()
             if timestep.terminal:
                 break
