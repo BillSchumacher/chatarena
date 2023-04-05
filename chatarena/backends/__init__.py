@@ -23,5 +23,4 @@ def load_backend(config: BackendConfig):
     except KeyError:
         raise ValueError(f"Unknown backend type: {config.backend_type}")
 
-    backend = backend_cls.from_config(config)
-    return backend
+    return backend_cls.from_config(config)

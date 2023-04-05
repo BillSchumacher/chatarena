@@ -106,7 +106,7 @@ class Chameleon(Environment):
         self._moderator_speak(f"Now the game starts! The topic is: {self.topic}")
         self._moderator_speak(f"You are not chameleon. The word is: {self.code}",
                               visible_to=self.non_chameleon_names)
-        self._moderator_speak(f"You are the chameleon!", visible_to=self.chameleon_name)
+        self._moderator_speak("You are the chameleon!", visible_to=self.chameleon_name)
         self._moderator_speak(
             f"Now everyone gives one clue (but don't give away the secret word). "
             f"You cannot repeat what others has said. We will start with {self.player_names[0]}.")
@@ -115,11 +115,11 @@ class Chameleon(Environment):
         self._players_votes = {name: 0 for name in self.player_names}
 
         self._initialized = True
-        init_timestep = TimeStep(observation=self.get_observation(),
-                                 reward=self.get_zero_rewards(),
-                                 terminal=False)
-
-        return init_timestep
+        return TimeStep(
+            observation=self.get_observation(),
+            reward=self.get_zero_rewards(),
+            terminal=False,
+        )
 
     def print(self):
         self.message_pool.print()
@@ -141,7 +141,7 @@ class Chameleon(Environment):
         text = text.lower()
         for name in self.player_names:
             candidates = [name.lower(), name.lower().replace(" ", ""), name.lower().replace(" ", "_")]
-            if any([candidate in text for candidate in candidates]):
+            if any(candidate in text for candidate in candidates):
                 return name
         return ""
 
@@ -151,17 +151,14 @@ class Chameleon(Environment):
         """
         # Get the word enclosed by quote marks with regex
         pattern = r"\"(.+?)\""
-        match = re.search(pattern, text)
-        if match:
-            return match.group(1).lower().replace(" ", "") == self.code.lower().replace(" ", "")
-        else:
-            # if no quote marks, check whether the last k words match the code
-            words = text.split()
-            if len(words) >= len(self.code.split()):
-                guessed_term = "".join(words[-len(self.code.split()):]).lower().replace(".", "")
-                return guessed_term == self.code.lower().replace(" ", "").replace(".", "")
-            else:
-                return False
+        if match := re.search(pattern, text):
+            return match[1].lower().replace(" ", "") == self.code.lower().replace(" ", "")
+        # if no quote marks, check whether the last k words match the code
+        words = text.split()
+        if len(words) < len(self.code.split()):
+            return False
+        guessed_term = "".join(words[-len(self.code.split()):]).lower().replace(".", "")
+        return guessed_term == self.code.lower().replace(" ", "").replace(".", "")
 
     def _moderator_speak(self, text: str, visible_to: Union[str, List[str]] = "all"):
         """
@@ -174,12 +171,10 @@ class Chameleon(Environment):
         """
         get rewards for each player
         """
-        rewards = {}
-        for name in self.player_names:
-            # The winner gets 1, the loser gets 0
-            rewards[name] = float((name == self.chameleon_name) == chameleon_win)
-
-        return rewards
+        return {
+            name: float((name == self.chameleon_name) == chameleon_win)
+            for name in self.player_names
+        }
 
     def is_terminal(self) -> bool:
         """

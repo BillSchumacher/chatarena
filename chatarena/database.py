@@ -119,15 +119,11 @@ class SupabaseDB:
 
 # Log the arena results into the Supabase database
 def log_arena(arena: Arena, database=None):
-    if database is None:
-        pass
-    else:
+    if database is not None:
         database.save_arena(arena)
 
 
 # Log the messages into the Supabase database
 def log_messages(arena: Arena, messages: List[Message], database=None):
-    if database is None:
-        pass
-    else:
+    if database is not None:
         database.save_messages(arena, messages)

@@ -117,7 +117,7 @@ def test_chess_environment():
     moves = ["Move (4, 1) to (4, 3)", "Move (4, 6) to (4, 4)",
              "Move (6, 0) to (5, 2)", "Move (1, 7) to (2, 5)"]
 
-    for i, move in enumerate(moves):
+    for move in moves:
         assert env.check_action(move, env.get_next_player())
         timestep = env.step(env.get_next_player(), move)
         print(timestep.reward)

@@ -23,5 +23,4 @@ def load_environment(config: EnvironmentConfig):
         raise ValueError(f"Unknown environment type: {config['env_type']}")
 
     print(config)
-    env = env_cls.from_config(config)
-    return env
+    return env_cls.from_config(config)
